@@ -69,10 +69,9 @@ public class Player : MonoBehaviour
     {
         isOutOfBase = true;
         pathIndex = 0;  // Reset pathIndex
-        currentCoordinates = GridManager.instance.GetCoordinatesFromPosition(startNode.transform.position);
+        currentCoordinates = startNode.coordinates; // GridManager.instance.GetCoordinatesFromPosition(startNode.transform.position);
         path = pathFinder.GetPath(currentCoordinates, destinationCoordinates);
         StartCoroutine(Move());
-        //StartCoroutine(MoveOutOfBase());
     }
 
     /// <summary>
@@ -88,44 +87,6 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// Moves out of baseNode to startNode
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator MoveOutOfBase()
-    {
-        if (isMoving)
-        {
-            yield break;     // Stop the Coroutine
-        }
-
-        isMoving = true;
-
-        // check Ludo Stone.cs>IEnumerator Move
-        //while () { }
-
-
-        // Code here to pathfind to get path
-        // Code here to do arc move
-        Vector3 startPosition = transform.position;
-        Vector3 nextPosition = startNode.transform.position;
-
-        // while moving
-        while (MoveInArcToNextNode(startPosition, nextPosition, speed))
-        {
-            yield return null;
-        }
-
-        yield return new WaitForSeconds(0.1f);
-        curveTime = 0;
-
-        // Update goal node
-        goalNode = startNode;
-        goalNode.player = this;
-        goalNode.isTaken = true;
-    }
-
-
-    /// <summary>
     /// Move to next node
     /// </summary>
     /// <returns></returns>
@@ -137,6 +98,7 @@ public class Player : MonoBehaviour
         }
 
         isMoving = true;
+        selector.SetActive(false);
         
         while(pathIndex < path.Count)
         {
@@ -158,12 +120,25 @@ public class Player : MonoBehaviour
             curveTime = 0;
             pathIndex++;
         }
-        
 
-        // Update goal node
-        goalNode = startNode;
+        // Reset node of player's last postion
+        if (currentNode != null)
+        {
+            currentNode.isTaken = false;
+        }
+
+        // Update goal node to be the the node player moved to
+        goalNode = path[path.Count - 1];
         goalNode.player = this;
         goalNode.isTaken = true;
+
+        currentNode = goalNode;
+        goalNode = null;
+        isMoving = false;
+
+        yield return new WaitForSeconds(1.5f);
+        // Report back to game manager to roll the dice
+        GameManager.instance.state = GameManager.States.ROLL_DIE;
     }
 
     /// <summary>

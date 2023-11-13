@@ -20,20 +20,6 @@ public class GridManager : MonoBehaviour
 
     int count;
 
-    /*[Header("ROOMS")]
-    public Rooms roomA;
-    public Rooms roomB;
-    public Rooms roomC;
-    public Rooms roomD;
-    public Rooms roomE;
-    public Rooms roomF;
-    public Rooms roomG;
-    public Rooms roomH;
-    public Rooms roomI;
-    public Rooms roomJ;
-    public Rooms roomK;
-    public Rooms roomL;//*/
-
     /// <summary>
     /// Property to get grid
     /// </summary>
@@ -121,6 +107,7 @@ public class GridManager : MonoBehaviour
             return;
         }
 
+        // Check node is not taked and is not player's current node
         if (!hightlightNode.isTaken && hightlightNode != playerNode)
         {
             hightlightNode.gameObject.GetComponent<MeshRenderer>().material = hightlightMaterail;
@@ -213,6 +200,7 @@ public class GridManager : MonoBehaviour
             entry.Value.isExplored = false;
             entry.Value.isPath = false;
             entry.Value.connectedTo = null;
+            entry.Value.isMoveOption = false;
         }
     }
 

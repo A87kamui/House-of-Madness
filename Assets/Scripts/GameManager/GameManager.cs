@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
     public DiceCheckZoneScript dieNumber;
 
     [Header("Ghost")]
-    int[] roomNumber = new int[13];
+    [SerializeField] SpawnController[] spawner;
 
     // Set instance to GameManager
     // Allows other scripts to access GameManager at any point
@@ -169,9 +169,6 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("startNode: " + player.startNode + " coordinates: " + player.startNode.coordinates);
-                //Node node = GridManager.instance.GetNode(player.startNode.coordinates);
-                //Node node = player.startNode;
                 GridManager.instance.HightLightTiles(dieNumber, player.startNode, player.baseNode);
             }
         }
@@ -195,29 +192,16 @@ public class GameManager : MonoBehaviour
             {
                 GridManager.instance.HightLightTiles(dieNumber, playerNode.leftNode, playerNode);
             }
-        }
-
-        // If at starting location
-        switch (dieNumber)
-        {
-            case 1:
-
-                break;
-            case 2:
-
-                break;
-            case 3:
-
-                break;
-            case 4:
-
-                break;
-            case 5:
-
-                break;
-            case 6:
-
-                break;
         }      
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void SpawnEnemy(int dieNumber)
+    {
+        Debug.Log("Spawn Ghost/tower");
+        camera.transform.position = cam2.transform.position;
+        camera.transform.rotation = cam2.transform.rotation;
     }
 }

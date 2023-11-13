@@ -30,42 +30,36 @@ public class DiceCheckZoneScript : MonoBehaviour {
                         dieNumber = 6;
                         dieThrown = false;
                         StartCoroutine(RollDieDelay());
-                        //GameManager.instance.DieRolled(dieNumber);
                         break;
                     case "Side2":
                         DiceNumberTextScript.diceNumber = 5;
                         dieNumber = 5;
                         dieThrown = false;
-                        StartCoroutine(RollDieDelay());
-                        //GameManager.instance.DieRolled(dieNumber);
+                        StartCoroutine(SpawnGhostDelay());
                         break;
                     case "Side3":
                         DiceNumberTextScript.diceNumber = 4;
                         dieNumber = 4;
                         dieThrown = false;
-                        StartCoroutine(RollDieDelay());
-                        //GameManager.instance.DieRolled(dieNumber);
+                        StartCoroutine(SpawnGhostDelay());
                         break;
                     case "Side4":
                         DiceNumberTextScript.diceNumber = 3;
                         dieNumber = 3;
                         dieThrown = false;
-                        StartCoroutine(RollDieDelay());
-                        //GameManager.instance.DieRolled(dieNumber);
+                        StartCoroutine(SpawnGhostDelay());
                         break;
                     case "Side5":
                         DiceNumberTextScript.diceNumber = 2;
                         dieNumber = 2;
                         dieThrown = false;
-                        StartCoroutine(RollDieDelay());
-                        //GameManager.instance.DieRolled(dieNumber);
+                        StartCoroutine(SpawnGhostDelay());
                         break;
                     case "Side6":
                         DiceNumberTextScript.diceNumber = 1;
                         dieNumber = 1;
                         dieThrown = false;
-                        StartCoroutine(RollDieDelay());
-                        // GameManager.instance.DieRolled(dieNumber);
+                        StartCoroutine(SpawnGhostDelay());
                         break;
                 }
             }
@@ -80,5 +74,15 @@ public class DiceCheckZoneScript : MonoBehaviour {
     {
         yield return new WaitForSeconds(1.5f);
         GameManager.instance.DieRolled(dieNumber);
+    }
+
+    /// <summary>
+    /// Wait for 1.5 seconds then call GameManager
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator SpawnGhostDelay()
+    {
+        yield return new WaitForSeconds(1.5f);
+        GameManager.instance.SpawnEnemy(dieNumber);
     }
 }

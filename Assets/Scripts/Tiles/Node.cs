@@ -6,12 +6,12 @@ using UnityEngine;
 public class Node : MonoBehaviour
 {
     public Player player;
-    //public Node nextNode;
-    //public Node previousNode;
     public Node leftNode;
     public Node rightNode;
     public Node topNode;
     public Node bottomNode;
+    //public Node nextNode;
+    //public Node previousNode;
     /*public Node doorPrevious;
     public Node doorNext;//*/
 
@@ -52,7 +52,6 @@ public class Node : MonoBehaviour
     /// </summary>
     private void OnMouseDown()
     {
-        //Debug.Log("calling On mouse down");
         if (isTaken)
         {
             return;
@@ -74,7 +73,5 @@ public class Node : MonoBehaviour
                 }
             }
         }
-        
-
     }
 }

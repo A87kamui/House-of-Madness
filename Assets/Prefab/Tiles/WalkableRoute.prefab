@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1328276963675994969}
-  - component: {fileID: 6188470854639780466}
   m_Layer: 0
   m_Name: WalkableRoute
   m_TagString: Untagged
@@ -70,22 +69,6 @@ Transform:
   - {fileID: 2434189797551302774}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6188470854639780466
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7190617542430626099}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ee6a9909a4e24adda87552f3124b034, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  doorMaterial: {fileID: 2100000, guid: a703db90bbc9e43e0b4d7b8885d1a316, type: 2}
-  hallwayMaterail: {fileID: 2100000, guid: d9d0ca96486a54cd7b22144a2556f1c4, type: 2}
-  hightlightMaterail: {fileID: 2100000, guid: 102ed73d43917406a8d8e05167c10d13, type: 2}
-  tilesList: []
 --- !u!1001 &284111125161376201
 PrefabInstance:
   m_ObjectHideFlags: 0

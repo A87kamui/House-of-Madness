@@ -10,6 +10,9 @@ TagManager:
   - EmptyTile
   - DoorTile
   - RoomConnectionTile
+  - SpawnTile
+  - Ghost
+  - Tower
   layers:
   - Default
   - TransparentFX
