@@ -13,6 +13,7 @@ TagManager:
   - SpawnTile
   - Ghost
   - Tower
+  - RoomCamera
   layers:
   - Default
   - TransparentFX

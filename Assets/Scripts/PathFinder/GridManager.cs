@@ -134,7 +134,7 @@ public class GridManager : MonoBehaviour
             {
                 node.gameObject.GetComponent<MeshRenderer>().material = hallwayMaterail;
             }
-            if (node.tag == "DoorTile")
+            if (node.tag == "SpawnTile")
             {
                 node.gameObject.GetComponent<MeshRenderer>().material = doorMaterial;
             }

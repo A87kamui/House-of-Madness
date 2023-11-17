@@ -41,7 +41,7 @@ public class Node : MonoBehaviour
         {
             isWalkable = false;
         }
-        if (gameObject.tag == "Hallway" || gameObject.tag == "DoorTile")
+        if (gameObject.tag == "Hallway" || gameObject.tag == "DoorTile" || gameObject.tag == "SpawnTile")
         {
             isWalkable = true;
         }
@@ -49,6 +49,7 @@ public class Node : MonoBehaviour
 
     /// <summary>
     /// Select tile to move to
+    /// Pass coordinates to GameManager
     /// </summary>
     private void OnMouseDown()
     {

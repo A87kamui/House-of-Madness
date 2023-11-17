@@ -13,7 +13,12 @@ public class SpawnController : MonoBehaviour
     GameObject[] pool;
 
     int count = 0;
+
+    public Transform roomCamera;
     public bool haunted = false;
+    public bool spawnedGhost = false;
+    public int index;
+    
 
     private void Awake()
     {
@@ -60,39 +65,50 @@ public class SpawnController : MonoBehaviour
     /// </summary>
     public void SpawnGhost()
     {
-        StartCoroutine(SpawnGhostDelay());
-
+        if (count < 2 && !haunted)
+        {
+            StartCoroutine(SpawnGhostDelay());
+            
+        }
+        if (count == 2 && !haunted)
+        {
+            StartCoroutine(SpawnTowerDelay());       
+        }
+        //Debug.Log("Count: " + count);
+        //Debug.Log("Haunted: " + haunted);
     }
 
     IEnumerator SpawnGhostDelay()
     {
-        if (count < 2 && !haunted)
-        {
-            Debug.Log("Count: " + count);
-            Debug.Log("Haunted: " + haunted);
-            pool[count].transform.position = ghostSpawner[count].transform.position;
 
-            // Spawn smoke particle effect
+        pool[count].transform.position = ghostSpawner[count].transform.position;
 
-            yield return new WaitForSeconds(1.0f);
-            pool[count].SetActive(true);
-            count++;
-        }
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(2.0f);
+        // Spawn smoke particle effect
+        pool[count].SetActive(true);
+        spawnedGhost = true;
+        count++;
     }
 
-    public void SpawnTower()
+    IEnumerator SpawnTowerDelay()
     {
-        if (count == 2)
-        {
-            Debug.Log("Count: " + count);
-            pool[count].transform.position = ghostSpawner[count].transform.position;
-            pool[count].SetActive(true);
-            haunted = true;
+        
+        pool[count].transform.position = towerSpawner.transform.position;
 
-            Debug.Log("Haunted: " + haunted);
-            count = 0;  // Reset count
-            Debug.Log("Count: " + count);
+        //particle effect for ghost to be removed
+
+        yield return new WaitForSeconds(2.0f);
+        // Deactivate ghost
+        for (int i = 0; i < 2; i++)
+        {
+            pool[i].SetActive(false);
+            // Spawn smoke particle effect
         }
+        spawnedGhost = false;
+
+        pool[count].SetActive(true);
+        haunted = true;
+        count = 0;  // Reset count
+        
     }
 }

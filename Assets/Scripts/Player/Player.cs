@@ -22,6 +22,8 @@ public class Player : MonoBehaviour
     PathFinder pathFinder;
     List<Node> path = new List<Node>();
     public Vector2Int currentCoordinates;
+    public Transform playerCam;
+    Vector3 playerCamHeight = new Vector3(0, 2, 0);
     int pathIndex;   // index in path
     int startNodeIndex;
 
@@ -69,8 +71,9 @@ public class Player : MonoBehaviour
     {
         isOutOfBase = true;
         pathIndex = 0;  // Reset pathIndex
-        currentCoordinates = startNode.coordinates; // GridManager.instance.GetCoordinatesFromPosition(startNode.transform.position);
+        currentCoordinates = startNode.coordinates;
         path = pathFinder.GetPath(currentCoordinates, destinationCoordinates);
+        GameManager.instance.camera.transform.rotation = this.playerCam.rotation;
         StartCoroutine(Move());
     }
 
@@ -83,6 +86,7 @@ public class Player : MonoBehaviour
         pathIndex = 0;  // Reset pathIndex
         currentCoordinates = GridManager.instance.GetCoordinatesFromPosition(transform.position);
         path = pathFinder.GetPath(currentCoordinates, destinationCoordinates);
+        GameManager.instance.camera.transform.rotation = this.playerCam.rotation;
         StartCoroutine(Move());
     }
 
@@ -136,13 +140,31 @@ public class Player : MonoBehaviour
         goalNode = null;
         isMoving = false;
 
-        yield return new WaitForSeconds(1.5f);
-        // Report back to game manager to roll the dice
-        GameManager.instance.state = GameManager.States.ROLL_DIE;
+        yield return new WaitForSeconds(2.0f);
+
+        // Check for ghost to fight
+        if (CheckFightGhost())
+        {
+            GameManager.instance.state = GameManager.States.FIGHT_GHOST;
+        }
+
+        // Check if haunted to fight but skip movement
+        else if (CheckHaunted())
+        {
+            GameManager.instance.state = GameManager.States.FIGHT_HAUNTED;
+        }
+
+        else if (!CheckFightGhost() && !CheckHaunted())
+        {
+            // Report back to game manager to roll the dice
+            GameManager.instance.state = GameManager.States.ROLL_DIE;
+        }
+        
     }
 
     /// <summary>
     /// Move in an arc to goal
+    /// Move camera with player
     /// </summary>
     /// <param name="startPosition"></param>
     /// <param name="goalPosition"></param>
@@ -150,6 +172,7 @@ public class Player : MonoBehaviour
     /// <returns></returns>
     bool MoveInArcToNextNode(Vector3 startPosition, Vector3 goalPosition, float speed)
     {
+        GameManager.instance.camera.transform.position = this.playerCam.position;
         curveTime += speed * Time.deltaTime;
 
         // Track player position between two points
@@ -159,5 +182,26 @@ public class Player : MonoBehaviour
         myPosition.y = amplitude * Mathf.Sin(Mathf.Clamp01(curveTime) * Mathf.PI);
 
         return goalPosition != (transform.position = Vector3.Lerp(transform.position, myPosition, curveTime));
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    bool CheckFightGhost()
+    {
+        if (currentNode.tag == "SpawnTile")
+        {
+            return currentNode.GetComponentInChildren<SpawnController>().spawnedGhost;
+        }
+        return false;
+    }
+
+    bool CheckHaunted()
+    {
+        if (currentNode.tag == "SpawnTile")
+        {
+            return currentNode.GetComponentInChildren<SpawnController>().haunted;
+        }
+        return false;
     }
 }
