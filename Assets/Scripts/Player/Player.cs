@@ -34,8 +34,7 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        
-        
+                
     }
     // Start is called before the first frame update
     void Start()
@@ -149,15 +148,15 @@ public class Player : MonoBehaviour
         }
 
         // Check if haunted to fight but skip movement
-        else if (CheckHaunted())
+        else if (CheckCursed())
         {
-            GameManager.instance.state = GameManager.States.FIGHT_HAUNTED;
+            GameManager.instance.state = GameManager.States.FIGHT_CURSE;
         }
 
-        else if (!CheckFightGhost() && !CheckHaunted())
+        else if (!CheckFightGhost() && !CheckCursed())
         {
-            // Report back to game manager to roll the dice
-            GameManager.instance.state = GameManager.States.ROLL_DIE;
+            // Report back to game manager to check curse count
+            GameManager.instance.state = GameManager.States.CURSE_CHECK;
         }
         
     }
@@ -185,7 +184,7 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// Check if fighting a ghost
     /// </summary>
     bool CheckFightGhost()
     {
@@ -196,11 +195,15 @@ public class Player : MonoBehaviour
         return false;
     }
 
-    bool CheckHaunted()
+    /// <summary>
+    /// Check if fighting a curse
+    /// </summary>
+    /// <returns></returns>
+    bool CheckCursed()
     {
         if (currentNode.tag == "SpawnTile")
         {
-            return currentNode.GetComponentInChildren<SpawnController>().haunted;
+            return currentNode.GetComponentInChildren<SpawnController>().isCursed;
         }
         return false;
     }

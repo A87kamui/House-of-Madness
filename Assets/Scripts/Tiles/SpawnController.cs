@@ -12,10 +12,10 @@ public class SpawnController : MonoBehaviour
     [SerializeField] int poolSize = 3;
     GameObject[] pool;
 
-    int count = 0;
+    int enemyCount = 0;
 
     public Transform roomCamera;
-    public bool haunted = false;
+    public bool isCursed = false;
     public bool spawnedGhost = false;
     public int index;
     
@@ -23,7 +23,7 @@ public class SpawnController : MonoBehaviour
     private void Awake()
     {
         PopulatePool();
-        count = 0;
+        enemyCount = 0;
     }
 
     // Start is called before the first frame update
@@ -65,35 +65,33 @@ public class SpawnController : MonoBehaviour
     /// </summary>
     public void SpawnGhost()
     {
-        if (count < 2 && !haunted)
+        if (enemyCount < 2 && !isCursed)
         {
             StartCoroutine(SpawnGhostDelay());
             
         }
-        if (count == 2 && !haunted)
+        if (enemyCount == 2 && !isCursed)
         {
             StartCoroutine(SpawnTowerDelay());       
         }
-        //Debug.Log("Count: " + count);
-        //Debug.Log("Haunted: " + haunted);
     }
 
     IEnumerator SpawnGhostDelay()
     {
-
-        pool[count].transform.position = ghostSpawner[count].transform.position;
+        pool[enemyCount].transform.position = ghostSpawner[enemyCount].transform.position;
 
         yield return new WaitForSeconds(2.0f);
         // Spawn smoke particle effect
-        pool[count].SetActive(true);
+        pool[enemyCount].SetActive(true);
         spawnedGhost = true;
-        count++;
+        isCursed = false;
+        enemyCount++;
+        print("Name: " + this.name);
     }
 
     IEnumerator SpawnTowerDelay()
-    {
-        
-        pool[count].transform.position = towerSpawner.transform.position;
+    {       
+        pool[enemyCount].transform.position = towerSpawner.transform.position;
 
         //particle effect for ghost to be removed
 
@@ -106,9 +104,78 @@ public class SpawnController : MonoBehaviour
         }
         spawnedGhost = false;
 
-        pool[count].SetActive(true);
-        haunted = true;
-        count = 0;  // Reset count
+        pool[enemyCount].SetActive(true);
+        isCursed = true;
+        GameManager.instance.curseCount += 1;
+        print("Name: " + this.name);
+    }
+
+    /// <summary>
+    /// Start a delay to remove ghost in room
+    /// </summary>
+    public void DefeatGhost()
+    {
+        StartCoroutine(DefeatGhostDelay());
         
+    }
+
+    /// <summary>
+    /// Remove ghost(s) in room
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator DefeatGhostDelay()
+    {
+        yield return new WaitForSeconds(2.0f);
+        print("Count: " + enemyCount);
+        if (enemyCount == 2)
+        {
+            enemyCount -= 1;
+            pool[enemyCount].SetActive(false);
+        }
+        else if (enemyCount == 1)
+        {
+            enemyCount -= 1;
+            pool[enemyCount].SetActive(false);
+        }
+
+        StartCoroutine(CurseCheckDelay());
+    }
+
+    /// <summary>
+    /// Start a delay to remove tower in room
+    /// </summary>
+    public void DefeatCurse()
+    {
+        StartCoroutine(DefeatCurseDelay());
+
+    }
+
+    /// <summary>
+    /// Remove Tower in room
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator DefeatCurseDelay()
+    {
+        yield return new WaitForSeconds(2.0f);
+
+        if (isCursed)
+        {
+            pool[enemyCount].SetActive(false);
+            enemyCount = 0;  // Reset count
+            isCursed = false;
+            GameManager.instance.curseCount -= 1;
+        }
+
+        StartCoroutine(CurseCheckDelay());
+    }
+
+    /// <summary>
+    /// Wait then call GameManager to check number of curses
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator CurseCheckDelay()
+    {
+        yield return new WaitForSeconds(2.0f);
+        GameManager.instance.state = GameManager.States.CURSE_CHECK;
     }
 }

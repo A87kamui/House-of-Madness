@@ -38,17 +38,20 @@ public class GameManager : MonoBehaviour
         WAITING,
         ROLL_DIE,
         FIGHT_GHOST,
-        FIGHT_HAUNTED,
-        SWITCH_PLAYER
+        FIGHT_CURSE,
+        CURSE_CHECK,
+        SWITCH_PLAYER,
+        GAMEOVER
     }
 
     [Header("Camera")]
     public GameObject camera;
     public Transform cam1;
     public Transform cam2;
+    public Transform cam3;
     Vector2Int roomCamCoordinate;
     Vector3 roomCamPosition;
-    Vector3 roomCamHeight = new Vector3(0, 2, 0);
+    public Vector3 roomCamHeight = new Vector3(0, 2, 0);
 
     [Header("Player")]
     public States state;
@@ -57,31 +60,42 @@ public class GameManager : MonoBehaviour
     bool switchingPlayer;
     bool isTurn = true;
 
-    [Header("Die")]
-    public GameObject rollButton;
-    public GameObject die;
+    [Header("Dice")]
+    public GameObject moveButton;
+    public GameObject movementDie;
     DiceRoll dieRoll;
     [HideInInspector] public int dieRolled;
     public DiceCheckZoneScript dieNumber;
+
+    public GameObject fightButton;
+    public GameObject fightDie;
+    public FightDiceCheckZone fightDieSide;
+    FightRoll fightRoll;
+    bool ghostFight = false;
+    bool curseFight = true;
 
     [Header("Ghost")]
     [SerializeField] SpawnController[] spawner;
     [SerializeField] List<SpawnController> spawnerTrack;
     int spawnerIndex;  // Store index of which spawner to spawn
     int spawerTrackIndex;  // Store index of which spawnTracker to remove
+    public int curseCount = 0;
 
     // Set instance to GameManager
     // Allows other scripts to access GameManager at any point
     void Awake()
     {
         instance = this;
-        dieRoll = die.GetComponent<DiceRoll>();
+        dieRoll = movementDie.GetComponent<DiceRoll>();
+        fightRoll = fightDie.GetComponent<FightRoll>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        ActivateButton(false);
+        ActivateMoveDieButton(false);
+        ActivateFightDiceButton(false);
+        ActivateFightDice(false);
     }
 
     // Update is called once per frame
@@ -104,42 +118,70 @@ public class GameManager : MonoBehaviour
                     }
                     break;
                 case States.ROLL_DIE:
-                {
-                    if (isTurn)
                     {
-                        player = playerList[activePlayer].player;
-                        camera.transform.position = cam1.transform.position;
-                        camera.transform.rotation = cam1.transform.rotation;
-                        ActivateButton(true);
-                        state = States.WAITING; // Wait for dice roll to complete
+                        if (isTurn)
+                        {
+                            player = playerList[activePlayer].player;
+                            camera.transform.position = cam1.transform.position;
+                            camera.transform.rotation = cam1.transform.rotation;
+                            ActivateMoveDieButton(true);
+                            state = States.WAITING; // Wait for dice roll to complete
+                        }
                     }
-                }
                     break;
                 case States.FIGHT_GHOST:
-                {
-                        // Idle
-                        Debug.Log("Fight ghost");
-                        state = States.ROLL_DIE;
-                }
+                    { 
+                        ghostFight = true;
+                        curseFight = false;
+
+                        ActivateFightDice(true);
+                        ActivateFightDiceButton(true);
+                        camera.transform.position = cam3.transform.position;
+                        camera.transform.rotation = cam3.transform.rotation;
+                        state = States.WAITING; // Wait for dice roll to complete
+                    }
                     break;
-                case States.FIGHT_HAUNTED:
+                case States.FIGHT_CURSE:
                     {
-                        // Idle
-                        Debug.Log("Fight Haunted");
-                        state = States.ROLL_DIE;
+                        ghostFight = false;
+                        curseFight = true;
+
+                        ActivateFightDice(true);
+                        ActivateFightDiceButton(true);
+                        camera.transform.position = cam3.transform.position;
+                        camera.transform.rotation = cam3.transform.rotation;
+                        state = States.WAITING; // Wait for dice roll to complete
+                    }
+                    break;
+                case States.CURSE_CHECK:
+                    {
+                        print("Curse Count: " + curseCount);
+                        if (curseCount == 6)
+                        {
+                            state = States.GAMEOVER;
+                        }
+                        else
+                        {
+                            //***NEED TO SWITCH PLAYERS***
+                            //state = States.SWITCH_PLAYER;
+                            state = States.ROLL_DIE;
+                        }
                     }
                     break;
                 case States.SWITCH_PLAYER:
-                {
-                    if (isTurn)
                     {
-                        // Deactivate Button
-                        // Deactivate Highlights
-
-                        //StartCoroutine(SwitchPlayer());
+                        if (isTurn)
+                        {
+                            //StartCoroutine(SwitchPlayer());
+                            state = States.WAITING;
+                        }
+                    }
+                    break;
+                case States.GAMEOVER:
+                    {
+                        print("GameOver");
                         state = States.WAITING;
                     }
-                }
                     break;
             }
         }
@@ -149,9 +191,20 @@ public class GameManager : MonoBehaviour
     /// Activate Die roll button in game
     /// </summary>
     /// <param name="on"></param>
-    void ActivateButton(bool isActive)
+    void ActivateMoveDieButton(bool isActive)
     {
-        rollButton.SetActive(isActive);
+        moveButton.SetActive(isActive);
+    }
+
+    /// <summary>
+    /// Activate Fight Die roll button in game
+    /// Pass player to FightDiceCheckZone
+    /// </summary>
+    /// <param name="isActive"></param>
+    void ActivateFightDiceButton(bool isActive)
+    {
+        fightButton.SetActive(isActive);
+        fightDieSide.player = player;
     }
 
     /// <summary>
@@ -160,8 +213,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void RollDie()
     {
-        dieRoll.RollDie(); // Call Roll dice method
-        ActivateButton(false);
+        dieRoll.RollDie(); // Call Roll die method
+        ActivateMoveDieButton(false);
     }
 
     /// <summary>
@@ -175,10 +228,6 @@ public class GameManager : MonoBehaviour
         camera.transform.position = cam2.transform.position;
         camera.transform.rotation = cam2.transform.rotation;
         player.SetSelector(true);
-
-        // TODO Check value of dice to add ghost to rooms
-        // TODO Check number of ghost in a room to add ghost Towers
-        // TODO Display possible locations to move to
 
         // Check if startTile is taken
         startTileTaken = false;
@@ -196,7 +245,7 @@ public class GameManager : MonoBehaviour
         {
             if (startTileTaken && dieNumber == 1)
             {
-                state = States.SWITCH_PLAYER;
+                state = States.CURSE_CHECK;
             }
             else
             {
@@ -231,53 +280,46 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SpawnEnemy(int dieNumber)
     {
-        //Debug.Log("Spawn Ghost/tower");
-        //Debug.Log("SapwnTracker count: " + spawnerTrack.Count);
-        Debug.Log("SpawnTracker is empty: " + spawnerTrack == null);
-
         //Need to randomly spawn a ghost and track
         if (spawnerTrack.Count > 0)
         {
             spawnerIndex = Random.Range(0, spawnerTrack.Count + 1);
             spawerTrackIndex = spawnerIndex;
-            Debug.Log("Random spawnerIndex number: " + spawnerIndex);
 
             if (spawnerIndex < spawnerTrack.Count)
             {
-                // Get the index of remaining rooms available
+                // Get the index of remaining rooms available and spawn ghost
                 spawnerIndex = spawnerTrack[spawnerIndex].index;
-                Debug.Log("spawnerIndex from track: " + spawnerIndex);
+                spawner[spawnerIndex].SpawnGhost();
+
+                roomCamCoordinate = GridManager.instance.GetCoordinatesFromPosition(spawner[spawnerIndex].roomCamera.transform.position);
+                roomCamPosition = GridManager.instance.GetPositionFromCoordinates(roomCamCoordinate);
+
+                camera.transform.position = roomCamPosition + roomCamHeight;
+                camera.transform.rotation = spawner[spawnerIndex].roomCamera.transform.rotation;
+
+                // Remove from spawerTrack at random num index
                 spawnerTrack.RemoveAt(spawerTrackIndex);
             }
-            
-            Debug.Log("SpawnTracker count after remove: " + spawnerTrack.Count);
-        }
-
-        if (spawerTrackIndex < spawnerTrack.Count)
-        {
-            spawner[spawnerIndex].SpawnGhost();
-
-            roomCamCoordinate = GridManager.instance.GetCoordinatesFromPosition(spawner[spawnerIndex].roomCamera.transform.position);
-            roomCamPosition = GridManager.instance.GetPositionFromCoordinates(roomCamCoordinate);
-
-
-            camera.transform.position = roomCamPosition + roomCamHeight;
-            camera.transform.rotation = spawner[spawnerIndex].roomCamera.transform.rotation;
-        }
-        else if (spawnerIndex == spawnerTrack.Count || spawnerTrack == null)
-        {
-            Debug.Log("SHUFFLE");
-            spawnerTrack.Clear();
-            foreach(SpawnController spawnController in spawner)
+            else 
             {
-                spawnerTrack.Add(spawnController);
+                SummonMoreGhost(dieNumber); 
             }
         }
-        
+        else
+        {
+            SummonMoreGhost(dieNumber);
+        }
+
         StartCoroutine(SpawnEnemyDelay(dieNumber));
         state = States.WAITING;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="dieNumber"></param>
+    /// <returns></returns>
     IEnumerator SpawnEnemyDelay(int dieNumber)
     {
         // Wait to show ghost that spawned then call roll die
@@ -286,15 +328,32 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Add all ghost spawners back to spawner track
+    /// </summary>
+    void SummonMoreGhost(int dieNumber)
+    {
+        spawnerTrack.Clear();
+        foreach (SpawnController spawnController in spawner)
+        {
+            spawnerTrack.Add(spawnController);
+        }
+
+        print("Shuffle ghost back");
+        StartCoroutine(SpawnEnemyDelay(dieNumber));
+        state = States.WAITING;
+    }
+
+    /// <summary>
     /// Call Spawn starting ghosts delay
     /// </summary>
     void SpawnStartingGhost()
     {
-        // Rooms = B D E F
+        // Rooms = B D E F       
         spawner[1].SpawnGhost();
         spawner[3].SpawnGhost();
         spawner[4].SpawnGhost();
         spawner[5].SpawnGhost();
+
         StartCoroutine(SpawnStartingGhostDelay());
         state = States.WAITING;     
     }
@@ -306,11 +365,58 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <returns></returns>
     IEnumerator SpawnStartingGhostDelay()
-    {        
+    {
         yield return new WaitForSeconds(4.0f);
-        state = States.ROLL_DIE;
+        state = States.CURSE_CHECK;
     }
 
-    
+    /// <summary>
+    /// Activate or deactivate fight dice for ghost or curse
+    /// </summary>
+    /// <param name="isActive"></param>
+    void ActivateFightDice(bool isActive)
+    {
+        fightRoll.gameObject.SetActive(isActive);
+        /*if (ghostFight)
+        {
+            //Debug.Log("Ghost fight die");
+            fightRoll1.gameObject.SetActive(isActive);
+        }
+        if (curseFight)
+        {
+            //Debug.Log("Curse fight dice");
+            fightRoll1.gameObject.SetActive(isActive);
+            fightRoll2.gameObject.SetActive(isActive);
+        } //*/  
+    }
 
+    /// <summary>
+    /// Roll fight die/dice
+    /// Deactivate fight Button
+    /// </summary>
+    public void FightDieRoll()
+    {
+        fightRoll.RollDie();
+        /*if (ghostFight)
+        {
+            fightRoll1.RollDie();
+        }
+        if (curseFight)
+        {
+            fightRoll1.RollDie();
+            fightRoll2.RollDie();
+        }//*/    
+        ActivateFightDiceButton(false);
+    }
+
+    /// <summary>
+    /// Reset dice positions after getting value. 
+    /// </summary>
+    /*public void ResetDicePosition()
+    {
+        Debug.Log("Reset position");
+        GameManager.instance.fightDie1.transform.position = fightDie1.GetComponentInParent<Transform>().position + diePostion1;
+        //GameManager.instance.fightDie2.transform.position = fightDie2.GetComponentInParent<Transform>().position + diePostion2;
+        ActivateFightDice(false);
+    }//*/
 }
