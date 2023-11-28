@@ -140,25 +140,7 @@ public class Player : MonoBehaviour
         isMoving = false;
 
         yield return new WaitForSeconds(2.0f);
-
-        // Check for ghost to fight
-        if (CheckFightGhost())
-        {
-            GameManager.instance.state = GameManager.States.FIGHT_GHOST;
-        }
-
-        // Check if haunted to fight but skip movement
-        else if (CheckCursed())
-        {
-            GameManager.instance.state = GameManager.States.FIGHT_CURSE;
-        }
-
-        else if (!CheckFightGhost() && !CheckCursed())
-        {
-            // Report back to game manager to check curse count
-            GameManager.instance.state = GameManager.States.CURSE_CHECK;
-        }
-        
+        CheckGhostOrCurse();   
     }
 
     /// <summary>
@@ -184,11 +166,36 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
+    /// Check for a ghost or curse at current location
+    /// </summary>
+    public void CheckGhostOrCurse()
+    {
+        print("CheckGhostOrCurs");
+        // Check for ghost to fight
+        if (CheckFightGhost())
+        {
+            GameManager.instance.state = GameManager.States.FIGHT_GHOST;
+        }
+
+        // Check if haunted to fight but skip movement
+        else if (CheckCursed())
+        {
+            GameManager.instance.state = GameManager.States.FIGHT_CURSE;
+        }
+
+        else if (!CheckFightGhost() && !CheckCursed())
+        {
+            // Report back to game manager to check curse count
+            GameManager.instance.state = GameManager.States.SWITCH_PLAYER;
+        }
+    }
+
+    /// <summary>
     /// Check if fighting a ghost
     /// </summary>
     bool CheckFightGhost()
     {
-        if (currentNode.tag == "SpawnTile")
+        if (currentNode != null && currentNode.tag == "SpawnTile")
         {
             return currentNode.GetComponentInChildren<SpawnController>().spawnedGhost;
         }
@@ -201,7 +208,7 @@ public class Player : MonoBehaviour
     /// <returns></returns>
     bool CheckCursed()
     {
-        if (currentNode.tag == "SpawnTile")
+        if (currentNode != null && currentNode.tag == "SpawnTile")
         {
             return currentNode.GetComponentInChildren<SpawnController>().isCursed;
         }

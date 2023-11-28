@@ -43,7 +43,7 @@ public class FightDiceCheckZone : MonoBehaviour
                     case "Side3":
                         //dieNumber = 4;
                         dieThrown = false;
-                        StartCoroutine(CurseCheckDelay());
+                        StartCoroutine(SwitchPlayerDelay());
                         break;
                 }
             }
@@ -51,13 +51,13 @@ public class FightDiceCheckZone : MonoBehaviour
     }
 
     /// <summary>
-    /// Wait for 1.5 seconds then call GameManager 
+    /// Wait for 2 seconds then call GameManager 
     /// </summary>
     /// <returns></returns>
-    IEnumerator CurseCheckDelay()
+    IEnumerator SwitchPlayerDelay()
     {
         yield return new WaitForSeconds(2.0f);
-        GameManager.instance.state = GameManager.States.CURSE_CHECK;
+        GameManager.instance.state = GameManager.States.SWITCH_PLAYER;
     }
 
     /// <summary>

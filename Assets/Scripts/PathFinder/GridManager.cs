@@ -18,8 +18,6 @@ public class GridManager : MonoBehaviour
     public List<Node> tilesHighlighted = new List<Node>(); // Tracks highlited tiles
     Transform[] childTilesTransfrom;
 
-    int count;
-
     /// <summary>
     /// Property to get grid
     /// </summary>
@@ -107,20 +105,37 @@ public class GridManager : MonoBehaviour
             return;
         }
 
-        // Check node is not taked and is not player's current node
+        // Check startnode is not taken and Player is not at starting node
         if (!hightlightNode.isTaken && hightlightNode != playerNode)
         {
             hightlightNode.gameObject.GetComponent<MeshRenderer>().material = hightlightMaterail;
             hightlightNode.isMoveOption = true;
             tilesHighlighted.Add(hightlightNode);
         }
+        dieNumber -= 1;
+        HightLightTiles(dieNumber, hightlightNode.topNode, playerNode);
+        HightLightTiles(dieNumber, hightlightNode.bottomNode, playerNode);
+        HightLightTiles(dieNumber, hightlightNode.leftNode, playerNode);
+        HightLightTiles(dieNumber, hightlightNode.rightNode, playerNode);
 
-        HightLightTiles(dieNumber - 1, hightlightNode.topNode, playerNode);
-        HightLightTiles(dieNumber - 1, hightlightNode.bottomNode, playerNode);
-        HightLightTiles(dieNumber - 1, hightlightNode.leftNode, playerNode);
-        HightLightTiles(dieNumber - 1, hightlightNode.rightNode, playerNode);
-        //HightLightTiles(dieNumber - 1, hightlightNode.doorNext, playerNode);
-        //HightLightTiles(dieNumber - 1, hightlightNode.doorPrevious, playerNode);//*/
+        print("tilesHighlighted.Count " + tilesHighlighted.Count);
+        print("dieNumber " + dieNumber);
+        // Check for no place to move = switch plaer
+        if (tilesHighlighted.Count <= 0 && dieNumber <= 0)
+        {
+            print("No place to move");
+            GameManager.instance.player.CheckGhostOrCurse();
+        }
+    }
+
+    /// <summary>
+    /// Wait for 2 seconds then call GameManager 
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator SwitchPlayerDelay()
+    {
+        yield return new WaitForSeconds(2.0f);
+        GameManager.instance.state = GameManager.States.SWITCH_PLAYER;
     }
 
     /// <summary>

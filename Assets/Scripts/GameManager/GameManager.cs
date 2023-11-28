@@ -56,8 +56,8 @@ public class GameManager : MonoBehaviour
     [Header("Player")]
     public States state;
     public Player player;
-    public int activePlayer;
-    bool switchingPlayer;
+    public int activePlayer = -1;
+    public bool switchingPlayer = false;
     bool isTurn = true;
 
     [Header("Dice")]
@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (playerList[activePlayer].playerType == Entity.PlayerTypes.HUMAN)
+        if (activePlayer == -1)
         {
             switch (state)
             {
@@ -111,7 +111,28 @@ public class GameManager : MonoBehaviour
                         camera.transform.rotation = cam2.transform.rotation;
                         SpawnStartingGhost();
                     }
-                break;
+                    break;//*/
+
+                case States.SWITCH_PLAYER:
+                    {
+                        if (isTurn)
+                        {
+                            print("Switching player");
+                            StartCoroutine(SwitchPlayer());
+                            state = States.WAITING;
+
+                            // Check if player's current location is cursed
+                            // If so, go to FIGHT_CURSE
+                            // If not, do a CURSE_CHECK>ROL_DICE
+                        }
+                    }
+                    break;
+            }
+        }
+        if (activePlayer != -1 && playerList[activePlayer].playerType == Entity.PlayerTypes.HUMAN)
+        {
+            switch (state)
+            {
                 case States.WAITING:
                     {
                         // Idle
@@ -154,16 +175,15 @@ public class GameManager : MonoBehaviour
                     }
                     break;
                 case States.CURSE_CHECK:
-                    {
-                        print("Curse Count: " + curseCount);
+                    {                        
                         if (curseCount == 6)
                         {
+                            print("Curse Count: " + curseCount);
                             state = States.GAMEOVER;
                         }
                         else
                         {
-                            //***NEED TO SWITCH PLAYERS***
-                            //state = States.SWITCH_PLAYER;
+                            //***NEED TO CHECK IF PLAYER NEED TO FIGHT CURSE OR ROLL DIE***
                             state = States.ROLL_DIE;
                         }
                     }
@@ -172,8 +192,14 @@ public class GameManager : MonoBehaviour
                     {
                         if (isTurn)
                         {
-                            //StartCoroutine(SwitchPlayer());
+                            print("Switching player");
+                            player.SetSelector(false);
+                            StartCoroutine(SwitchPlayer());
                             state = States.WAITING;
+
+                            // Check if player's current location is cursed
+                            // If so, go to FIGHT_CURSE
+                            // If not, do a CURSE_CHECK>ROL_DICE
                         }
                     }
                     break;
@@ -245,7 +271,7 @@ public class GameManager : MonoBehaviour
         {
             if (startTileTaken && dieNumber == 1)
             {
-                state = States.CURSE_CHECK;
+                state = States.SWITCH_PLAYER;
             }
             else
             {
@@ -367,7 +393,7 @@ public class GameManager : MonoBehaviour
     IEnumerator SpawnStartingGhostDelay()
     {
         yield return new WaitForSeconds(4.0f);
-        state = States.CURSE_CHECK;
+        state = States.SWITCH_PLAYER;
     }
 
     /// <summary>
@@ -377,17 +403,6 @@ public class GameManager : MonoBehaviour
     void ActivateFightDice(bool isActive)
     {
         fightRoll.gameObject.SetActive(isActive);
-        /*if (ghostFight)
-        {
-            //Debug.Log("Ghost fight die");
-            fightRoll1.gameObject.SetActive(isActive);
-        }
-        if (curseFight)
-        {
-            //Debug.Log("Curse fight dice");
-            fightRoll1.gameObject.SetActive(isActive);
-            fightRoll2.gameObject.SetActive(isActive);
-        } //*/  
     }
 
     /// <summary>
@@ -396,27 +411,40 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void FightDieRoll()
     {
-        fightRoll.RollDie();
-        /*if (ghostFight)
-        {
-            fightRoll1.RollDie();
-        }
-        if (curseFight)
-        {
-            fightRoll1.RollDie();
-            fightRoll2.RollDie();
-        }//*/    
+        fightRoll.RollDie();   
         ActivateFightDiceButton(false);
     }
 
     /// <summary>
-    /// Reset dice positions after getting value. 
+    /// Create a delay when switching players
     /// </summary>
-    /*public void ResetDicePosition()
+    /// <returns></returns>
+    IEnumerator SwitchPlayer()
     {
-        Debug.Log("Reset position");
-        GameManager.instance.fightDie1.transform.position = fightDie1.GetComponentInParent<Transform>().position + diePostion1;
-        //GameManager.instance.fightDie2.transform.position = fightDie2.GetComponentInParent<Transform>().position + diePostion2;
-        ActivateFightDice(false);
-    }//*/
+        if (switchingPlayer)
+        {
+            yield break;
+        }
+
+        switchingPlayer = true;
+        yield return new WaitForSeconds(2.0f);
+        // Set next player
+        SetNextActivePlayer();
+
+        switchingPlayer = false;
+    }
+
+    /// <summary>
+    /// Activate the next player
+    /// who has not won
+    /// </summary>
+    void SetNextActivePlayer()
+    {
+        activePlayer++;
+        activePlayer %= playerList.Count;
+        print("New active player: " + activePlayer);
+
+        // Set current active player and to do a Curse check
+        state = States.CURSE_CHECK;
+    }
 }

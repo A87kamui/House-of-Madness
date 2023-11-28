@@ -86,7 +86,7 @@ public class SpawnController : MonoBehaviour
         spawnedGhost = true;
         isCursed = false;
         enemyCount++;
-        print("Name: " + this.name);
+        //print("Name: " + this.name);
     }
 
     IEnumerator SpawnTowerDelay()
@@ -107,7 +107,6 @@ public class SpawnController : MonoBehaviour
         pool[enemyCount].SetActive(true);
         isCursed = true;
         GameManager.instance.curseCount += 1;
-        print("Name: " + this.name);
     }
 
     /// <summary>
@@ -126,7 +125,7 @@ public class SpawnController : MonoBehaviour
     IEnumerator DefeatGhostDelay()
     {
         yield return new WaitForSeconds(2.0f);
-        print("Count: " + enemyCount);
+
         if (enemyCount == 2)
         {
             enemyCount -= 1;
@@ -137,8 +136,8 @@ public class SpawnController : MonoBehaviour
             enemyCount -= 1;
             pool[enemyCount].SetActive(false);
         }
-
-        StartCoroutine(CurseCheckDelay());
+        print("Count: " + enemyCount);
+        StartCoroutine(SwitchPlayerDelay());
     }
 
     /// <summary>
@@ -166,16 +165,16 @@ public class SpawnController : MonoBehaviour
             GameManager.instance.curseCount -= 1;
         }
 
-        StartCoroutine(CurseCheckDelay());
+        StartCoroutine(SwitchPlayerDelay());
     }
 
     /// <summary>
     /// Wait then call GameManager to check number of curses
     /// </summary>
     /// <returns></returns>
-    IEnumerator CurseCheckDelay()
+    IEnumerator SwitchPlayerDelay()
     {
         yield return new WaitForSeconds(2.0f);
-        GameManager.instance.state = GameManager.States.CURSE_CHECK;
+        GameManager.instance.state = GameManager.States.SWITCH_PLAYER;
     }
 }
