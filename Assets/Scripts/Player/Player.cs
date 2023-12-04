@@ -20,6 +20,7 @@ public class Player : MonoBehaviour
     bool isMoving;
     public bool hasTurn;
     public bool hasKey;
+    [SerializeField] GameObject playerKey;
 
     PathFinder pathFinder;
     List<Node> path = new List<Node>();
@@ -151,6 +152,7 @@ public class Player : MonoBehaviour
         {
             Debug.Log("Dropped off key");
             hasKey = false;
+            playerKey.SetActive(false);
             GameManager.instance.state = GameManager.States.WIN_CHECK;
         }
         else
@@ -196,6 +198,7 @@ public class Player : MonoBehaviour
             hasKey = true;
             currentNode.takenKey = true;
             currentNode.key.SetActive(false);
+            playerKey.SetActive(true);
         }
         yield return new WaitForSeconds(1.5f);
         CheckGhostOrCurse();

@@ -359,8 +359,6 @@ public class GameManager : MonoBehaviour
             {
                 // Get the index of remaining rooms available and spawn ghost
                 spawnerIndex = spawnerTrack[spawnerIndex].index;
-
-
                 spawner[spawnerIndex].SpawnGhost();
 
                 roomCamCoordinate = GridManager.instance.GetCoordinatesFromPosition(spawner[spawnerIndex].roomCamera.transform.position);
@@ -384,29 +382,6 @@ public class GameManager : MonoBehaviour
 
         StartCoroutine(SpawnEnemyDelay(dieNumber));
         state = States.WAITING;
-    }
-
-    IEnumerator SpawnDieGhostDelay(int dieNumber, int spawnerIndex)
-    {
-        switch (dieNumber)
-        {
-            case 2:
-                {
-
-                }
-                break;
-        }
-        yield return new WaitForSeconds(2.0f);
-        spawner[spawnerIndex].SpawnGhost();
-
-        roomCamCoordinate = GridManager.instance.GetCoordinatesFromPosition(spawner[spawnerIndex].roomCamera.transform.position);
-        roomCamPosition = GridManager.instance.GetPositionFromCoordinates(roomCamCoordinate);
-
-        camera.transform.position = roomCamPosition + roomCamHeight;
-        camera.transform.rotation = spawner[spawnerIndex].roomCamera.transform.rotation;
-
-        // Remove from spawerTrack at random num index
-        spawnerTrack.RemoveAt(spawerTrackIndex);
     }
 
     /// <summary>
