@@ -72,6 +72,7 @@ public class DiceCheckZoneScript : MonoBehaviour {
     /// <returns></returns>
     IEnumerator RollDieDelay()
     {
+        dieNumber = 6;
         yield return new WaitForSeconds(1.5f);
         GameManager.instance.DieRolled(dieNumber);
     }
@@ -82,6 +83,7 @@ public class DiceCheckZoneScript : MonoBehaviour {
     /// <returns></returns>
     IEnumerator SpawnGhostDelay()
     {
+        dieNumber = 6;
         yield return new WaitForSeconds(1.5f);
         GameManager.instance.SpawnEnemy(dieNumber);
     }

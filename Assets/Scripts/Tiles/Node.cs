@@ -10,14 +10,13 @@ public class Node : MonoBehaviour
     public Node rightNode;
     public Node topNode;
     public Node bottomNode;
-    //public Node nextNode;
-    //public Node previousNode;
-    /*public Node doorPrevious;
-    public Node doorNext;//*/
 
     public Node connectedTo;    // Used in pathfinding BFS
 
     public Vector2Int coordinates;
+
+    public GameObject key;
+    public bool takenKey = false;
 
     public bool isWalkable; 
     public bool isExplored; 
@@ -30,6 +29,11 @@ public class Node : MonoBehaviour
     {
         coordinates = GridManager.instance.GetCoordinatesFromPosition(transform.position);
         SetIsWalkable();
+        if (key != null)
+        {
+            key.SetActive(true);
+            takenKey = false;
+        }   
     }
 
     /// <summary>
@@ -41,7 +45,7 @@ public class Node : MonoBehaviour
         {
             isWalkable = false;
         }
-        if (gameObject.tag == "Hallway" || gameObject.tag == "DoorTile" || gameObject.tag == "SpawnTile")
+        if (gameObject.tag == "Hallway" || gameObject.tag == "DoorTile" || gameObject.tag == "SpawnTile" || gameObject.tag == "EntranceTile")
         {
             isWalkable = true;
         }

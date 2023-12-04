@@ -93,6 +93,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2616443143955315963, guid: ffde784aacf644ff9b760280873458a1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1502833464791440798}
+    - targetCorrespondingSourceObject: {fileID: 2616443143955315963, guid: ffde784aacf644ff9b760280873458a1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5189973279747530168}
   m_SourcePrefab: {fileID: 100100000, guid: ffde784aacf644ff9b760280873458a1, type: 3}
 --- !u!1 &67268490551779559 stripped
 GameObject:
@@ -111,16 +114,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b72fe167bad094d5b8419a0a6963f0cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  towerPrefab: {fileID: 6060402888037317324, guid: a41e4ee23de7a4bb9b4748075740e2d6, type: 3}
+  cursePrefab: {fileID: 0}
   ghostPrefab: {fileID: 7351927557373841611, guid: 507b678b14ef54269a7cbef00b6d8418, type: 3}
-  towerSpawner: {fileID: 67268490551779559}
+  curseSpawner: {fileID: 0}
   ghostSpawner:
   - {fileID: 2171039274349399085}
   - {fileID: 1013708510910074049}
+  curseExplosion: {fileID: 5189973279747530168}
   poolSize: 3
   roomCamera: {fileID: 2127498652106541293}
-  haunted: 0
+  isCursed: 0
+  spawnedGhost: 0
   index: 0
+--- !u!114 &5189973279747530168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 67268490551779559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a0e5655a3170487c9bf5d4d31fe111c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionParticle: {fileID: 6363526817225399355}
 --- !u!1 &1013708510910074049 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3076222418269360349, guid: ffde784aacf644ff9b760280873458a1, type: 3}
@@ -129,6 +147,11 @@ GameObject:
 --- !u!1 &2171039274349399085 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4215529569942802481, guid: ffde784aacf644ff9b760280873458a1, type: 3}
+  m_PrefabInstance: {fileID: 2639537610172406812}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &6363526817225399355 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 9002216905762160679, guid: ffde784aacf644ff9b760280873458a1, type: 3}
   m_PrefabInstance: {fileID: 2639537610172406812}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &9085993208693850673 stripped

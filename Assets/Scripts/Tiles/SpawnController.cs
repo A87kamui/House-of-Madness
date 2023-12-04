@@ -5,10 +5,11 @@ using UnityEngine;
 
 public class SpawnController : MonoBehaviour
 {
-    [SerializeField] GameObject towerPrefab;
+    [SerializeField] GameObject cursePrefab;
     [SerializeField] GameObject ghostPrefab;
-    [SerializeField] GameObject towerSpawner;
+    [SerializeField] GameObject curseSpawner;
     [SerializeField] GameObject[] ghostSpawner;
+    [SerializeField] Explosion curseExplosion;
     [SerializeField] int poolSize = 3;
     GameObject[] pool;
 
@@ -24,18 +25,6 @@ public class SpawnController : MonoBehaviour
     {
         PopulatePool();
         enemyCount = 0;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     /// <summary>
@@ -54,7 +43,7 @@ public class SpawnController : MonoBehaviour
             }
             else
             {
-                pool[i] = Instantiate(towerPrefab, transform);
+                pool[i] = Instantiate(cursePrefab, transform);
             }
             pool[i].SetActive(false);
         }
@@ -64,16 +53,16 @@ public class SpawnController : MonoBehaviour
     /// Spawn Ghost in room
     /// </summary>
     public void SpawnGhost()
-    {
+    { 
         if (enemyCount < 2 && !isCursed)
         {
             StartCoroutine(SpawnGhostDelay());
             
         }
-        if (enemyCount == 2 && !isCursed)
+        else if (enemyCount == 2 && !isCursed)
         {
-            StartCoroutine(SpawnTowerDelay());       
-        }
+            StartCoroutine(SpawnCurseDelay());       
+        }       
     }
 
     IEnumerator SpawnGhostDelay()
@@ -86,14 +75,12 @@ public class SpawnController : MonoBehaviour
         spawnedGhost = true;
         isCursed = false;
         enemyCount++;
-        //print("Name: " + this.name);
+        Debug.Log("SC SpawnGhost enemy count: " + enemyCount);
     }
 
-    IEnumerator SpawnTowerDelay()
+    IEnumerator SpawnCurseDelay()
     {       
-        pool[enemyCount].transform.position = towerSpawner.transform.position;
-
-        //particle effect for ghost to be removed
+        pool[enemyCount].transform.position = curseSpawner.transform.position;
 
         yield return new WaitForSeconds(2.0f);
         // Deactivate ghost
@@ -107,6 +94,7 @@ public class SpawnController : MonoBehaviour
         pool[enemyCount].SetActive(true);
         isCursed = true;
         GameManager.instance.curseCount += 1;
+        Debug.Log("SC SpawnGhost enemy count: " + enemyCount);
     }
 
     /// <summary>
@@ -125,18 +113,22 @@ public class SpawnController : MonoBehaviour
     IEnumerator DefeatGhostDelay()
     {
         yield return new WaitForSeconds(2.0f);
-
-        if (enemyCount == 2)
+        if (!isCursed)
         {
-            enemyCount -= 1;
-            pool[enemyCount].SetActive(false);
+            if (enemyCount == 2)
+            {
+                enemyCount -= 1;
+                ghostSpawner[enemyCount].GetComponent<Explosion>().ExplosionPlay();
+                pool[enemyCount].SetActive(false);
+            }
+            else if (enemyCount == 1)
+            {
+                enemyCount -= 1;
+                ghostSpawner[enemyCount].GetComponent<Explosion>().ExplosionPlay();
+                pool[enemyCount].SetActive(false);
+            }
         }
-        else if (enemyCount == 1)
-        {
-            enemyCount -= 1;
-            pool[enemyCount].SetActive(false);
-        }
-        print("Count: " + enemyCount);
+        
         StartCoroutine(SwitchPlayerDelay());
     }
 
@@ -159,12 +151,13 @@ public class SpawnController : MonoBehaviour
 
         if (isCursed)
         {
+            Debug.Log("SC defeatcursedelay enemy count: " + enemyCount);
+            curseExplosion.ExplosionPlay();
             pool[enemyCount].SetActive(false);
             enemyCount = 0;  // Reset count
             isCursed = false;
             GameManager.instance.curseCount -= 1;
         }
-
         StartCoroutine(SwitchPlayerDelay());
     }
 
@@ -174,6 +167,7 @@ public class SpawnController : MonoBehaviour
     /// <returns></returns>
     IEnumerator SwitchPlayerDelay()
     {
+        Debug.Log("SC SpawnGhost enemy count: " + enemyCount);
         yield return new WaitForSeconds(2.0f);
         GameManager.instance.state = GameManager.States.SWITCH_PLAYER;
     }

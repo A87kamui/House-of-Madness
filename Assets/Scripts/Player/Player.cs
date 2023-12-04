@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,7 @@ public class Player : MonoBehaviour
     public bool isOutOfBase;  // In the game
     bool isMoving;
     public bool hasTurn;
+    public bool hasKey;
 
     PathFinder pathFinder;
     List<Node> path = new List<Node>();
@@ -28,14 +30,10 @@ public class Player : MonoBehaviour
     int startNodeIndex;
 
     // Arc Movement
-    float speed = 4.0f;
+    float speed = 2.5f;
     float amplitude = 0.75f; // hight
     float curveTime = 0.0f; // Track time it takes to move from one node to the next
 
-    private void Awake()
-    {
-                
-    }
     // Start is called before the first frame update
     void Start()
     {
@@ -95,13 +93,17 @@ public class Player : MonoBehaviour
     /// <returns></returns>
     IEnumerator Move()
     {
+        selector.SetActive(false);
+        GameManager.instance.camera.transform.position = new Vector3(this.playerCam.position.x, 2.5f, this.playerCam.position.z);
+        yield return new WaitForSeconds(1.0f);
+
         if (isMoving)
         {
             yield break;     // Stop the Coroutine
         }
 
         isMoving = true;
-        selector.SetActive(false);
+        
         
         while(pathIndex < path.Count)
         {
@@ -140,7 +142,21 @@ public class Player : MonoBehaviour
         isMoving = false;
 
         yield return new WaitForSeconds(2.0f);
-        CheckGhostOrCurse();   
+
+        if (!hasKey && currentNode.tag == "SpawnTile")
+        {
+            StartCoroutine(CheckForKey());
+        }
+        else if (hasKey && currentNode.tag == "EntranceTile")
+        {
+            Debug.Log("Dropped off key");
+            hasKey = false;
+            GameManager.instance.state = GameManager.States.WIN_CHECK;
+        }
+        else
+        {
+            CheckGhostOrCurse();
+        }       
     }
 
     /// <summary>
@@ -153,7 +169,9 @@ public class Player : MonoBehaviour
     /// <returns></returns>
     bool MoveInArcToNextNode(Vector3 startPosition, Vector3 goalPosition, float speed)
     {
-        GameManager.instance.camera.transform.position = this.playerCam.position;
+        GameManager.instance.camera.transform.position = new Vector3(this.playerCam.position.x, 2.5f, this.playerCam.position.z);
+        //GameManager.instance.camera.transform.position = this.playerCam.position;
+
         curveTime += speed * Time.deltaTime;
 
         // Track player position between two points
@@ -166,11 +184,29 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
+    /// Check if room has a key
+    /// If so, take key
+    /// </summary>
+    IEnumerator CheckForKey()
+    {
+        yield return new WaitForSeconds(1.5f);
+        Debug.Log("Check for key");
+        if (currentNode.tag == "SpawnTile" && currentNode.key != null && !currentNode.takenKey)
+        {
+            hasKey = true;
+            currentNode.takenKey = true;
+            currentNode.key.SetActive(false);
+        }
+        yield return new WaitForSeconds(1.5f);
+        CheckGhostOrCurse();
+    }
+
+    /// <summary>
     /// Check for a ghost or curse at current location
     /// </summary>
     public void CheckGhostOrCurse()
     {
-        print("CheckGhostOrCurs");
+        Debug.Log("End move, now CheckGhostOrCurse");
         // Check for ghost to fight
         if (CheckFightGhost())
         {
@@ -206,7 +242,7 @@ public class Player : MonoBehaviour
     /// Check if fighting a curse
     /// </summary>
     /// <returns></returns>
-    bool CheckCursed()
+    public bool CheckCursed()
     {
         if (currentNode != null && currentNode.tag == "SpawnTile")
         {

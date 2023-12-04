@@ -39,12 +39,6 @@ public class GridManager : MonoBehaviour
         SetConnections();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     /// <summary>
     /// Create nodes and place into grid dictionary
     /// Created nodes contain the x, y value coordinate location on the grid
@@ -102,11 +96,18 @@ public class GridManager : MonoBehaviour
     {
         if (dieNumber <= 0 || hightlightNode == null)
         {
-            return;
+            if (tilesHighlighted.Count <= 0)
+            {
+                Debug.Log("No place to move");
+                GameManager.instance.player.CheckGhostOrCurse();
+            }
+            else
+            {
+                return;
+            }      
         }
-
-        // Check startnode is not taken and Player is not at starting node
-        if (!hightlightNode.isTaken && hightlightNode != playerNode)
+        // Check hightlightNode is not taken and Player is not at hightlightNode
+        else if (!hightlightNode.isTaken && hightlightNode != playerNode)
         {
             hightlightNode.gameObject.GetComponent<MeshRenderer>().material = hightlightMaterail;
             hightlightNode.isMoveOption = true;
@@ -117,25 +118,6 @@ public class GridManager : MonoBehaviour
         HightLightTiles(dieNumber, hightlightNode.bottomNode, playerNode);
         HightLightTiles(dieNumber, hightlightNode.leftNode, playerNode);
         HightLightTiles(dieNumber, hightlightNode.rightNode, playerNode);
-
-        print("tilesHighlighted.Count " + tilesHighlighted.Count);
-        print("dieNumber " + dieNumber);
-        // Check for no place to move = switch plaer
-        if (tilesHighlighted.Count <= 0 && dieNumber <= 0)
-        {
-            print("No place to move");
-            GameManager.instance.player.CheckGhostOrCurse();
-        }
-    }
-
-    /// <summary>
-    /// Wait for 2 seconds then call GameManager 
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator SwitchPlayerDelay()
-    {
-        yield return new WaitForSeconds(2.0f);
-        GameManager.instance.state = GameManager.States.SWITCH_PLAYER;
     }
 
     /// <summary>
@@ -145,7 +127,7 @@ public class GridManager : MonoBehaviour
     {
         foreach(Node node in tilesHighlighted)
         {
-            if(node.tag == "Hallway")
+            if(node.tag == "Hallway" || node.tag == "EntranceTile")
             {
                 node.gameObject.GetComponent<MeshRenderer>().material = hallwayMaterail;
             }
@@ -191,7 +173,7 @@ public class GridManager : MonoBehaviour
     /// <summary>
     /// Get the world grid position from coordinates
     /// </summary>
-    /// <param name="position"></param>
+    /// <param name="coordinates"></param>
     /// <returns></returns>
     public Vector3 GetPositionFromCoordinates(Vector2Int coordinates)
     {
