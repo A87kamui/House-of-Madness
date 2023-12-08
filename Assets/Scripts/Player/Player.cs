@@ -192,7 +192,7 @@ public class Player : MonoBehaviour
     IEnumerator CheckForKey()
     {
         yield return new WaitForSeconds(1.5f);
-        Debug.Log("Check for key");
+        //Debug.Log("Check for key");
         if (currentNode.tag == "SpawnTile" && currentNode.key != null && !currentNode.takenKey)
         {
             hasKey = true;
@@ -209,7 +209,7 @@ public class Player : MonoBehaviour
     /// </summary>
     public void CheckGhostOrCurse()
     {
-        Debug.Log("End move, now CheckGhostOrCurse");
+        //Debug.Log("End move, now CheckGhostOrCurse");
         // Check for ghost to fight
         if (CheckFightGhost())
         {

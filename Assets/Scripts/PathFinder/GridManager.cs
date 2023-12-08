@@ -98,7 +98,7 @@ public class GridManager : MonoBehaviour
         {
             if (tilesHighlighted.Count <= 0)
             {
-                Debug.Log("No place to move");
+                //Debug.Log("No place to move");
                 GameManager.instance.player.CheckGhostOrCurse();
             }
             else
@@ -236,14 +236,6 @@ public class GridManager : MonoBehaviour
             {
                 Debug.Log("right: " + entity.Value.rightNode);
             }
-            /*if (entity.Value.doorPrevious != null)
-            {
-                Debug.Log("DoorPrevious: " + entity.Value.doorPrevious);
-            }
-            if (entity.Value.doorNext != null)
-            {
-                Debug.Log("DoorNext: " + entity.Value.doorNext);
-            }//*/
         }
     }
 }

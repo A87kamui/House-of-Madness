@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static GameManager.Entity;
 
 public class GameManager : MonoBehaviour
@@ -93,6 +94,7 @@ public class GameManager : MonoBehaviour
         instance = this;
         dieRoll = movementDie.GetComponent<DiceRoll>();
         fightRoll = fightDie.GetComponent<FightRoll>();
+        
     }
 
     // Start is called before the first frame update
@@ -141,7 +143,7 @@ public class GameManager : MonoBehaviour
                     break;
                 case States.ROLL_DIE:
                     {
-                        Debug.Log("State: " + state);
+                        //Debug.Log("State: " + state);
                         if (isTurn)
                         {
                             player = playerList[activePlayer].player;
@@ -154,7 +156,7 @@ public class GameManager : MonoBehaviour
                     break;
                 case States.FIGHT_GHOST:
                     {
-                        Debug.Log("State: " + state);
+                        //Debug.Log("State: " + state);
                         ghostFight = true;
                         curseFight = false;
 
@@ -167,7 +169,7 @@ public class GameManager : MonoBehaviour
                     break;
                 case States.FIGHT_CURSE:
                     {
-                        Debug.Log("State: " + state);
+                        //Debug.Log("State: " + state);
                         ghostFight = false;
                         curseFight = true;
 
@@ -180,12 +182,13 @@ public class GameManager : MonoBehaviour
                     break;
                 case States.CURSE_CHECK:
                     {
-                        Debug.Log("State: " + state);
+                        //Debug.Log("State: " + state);
                         if (curseCount >= 6)
                         {
                             state = States.LOSE_CHECK;
+                            //Debug.Log("State: " + state);
                         }
-                        if (player.CheckCursed())
+                        else if (player.CheckCursed())
                         {
                             StartCoroutine(ViewPlayer());
                         }
@@ -197,8 +200,9 @@ public class GameManager : MonoBehaviour
                     break;
                 case States.WIN_CHECK:
                     {
-                        Debug.Log("State: " + state);
+                        //Debug.Log("State: " + state);
                         keyCount++;
+                        InformationKeys.instance.ShowKeysText(keyCount + "");
                         if (keyCount >= 8)
                         {
                             gameOver = true;
@@ -212,20 +216,21 @@ public class GameManager : MonoBehaviour
                     break;
                 case States.SWITCH_PLAYER:
                     {
-                        Debug.Log("State: " + state);
+                        //Debug.Log("State: " + state);
                         if (isTurn)
                         {
                             player.SetSelector(false);
                             StartCoroutine(SwitchPlayer());
                             state = States.WAITING;
                         }
-                        Debug.Log("State: " + state);
+                        //Debug.Log("State: " + state);
                     }
                     break;
                 case States.LOSE_CHECK:
                     {
                         gameOver = true;
-                        Debug.Log("GameOver");
+                        state = States.GAMEOVER;
+                        //Debug.Log("State: " + state);
                     }
                     break;
             }
@@ -236,14 +241,16 @@ public class GameManager : MonoBehaviour
             {
                 case States.WIN:
                     {
-                        Debug.Log("Win");
+                        //Debug.Log("Win");
                         state = States.WAITING;
+                        SceneManager.LoadScene("Win");
                     }
                     break;
                 case States.GAMEOVER:
                     {
-                        Debug.Log("GameOver");
+                        //Debug.Log("GameOver");
                         state = States.WAITING;
+                        SceneManager.LoadScene("Game Over");
                     }
                     break;
                 case States.WAITING:
@@ -407,7 +414,7 @@ public class GameManager : MonoBehaviour
             spawnerTrack.Add(spawnController);
         }
 
-        Debug.Log("Shuffle ghost back");
+        //Debug.Log("Shuffle ghost back");
         StartCoroutine(SpawnEnemyDelay(dieNumber));
         state = States.WAITING;
     }
@@ -485,10 +492,11 @@ public class GameManager : MonoBehaviour
     {
         activePlayer++;
         activePlayer %= playerList.Count;
-        Debug.Log("New active player: " + activePlayer);
+        //Debug.Log("New active player: " + activePlayer);
 
         // Set current active player and to do a Curse check
         player = playerList[activePlayer].player;
+        InformationKeys.instance.ShowPlayerTurnText(player.name);
         state = States.CURSE_CHECK;
     }
 

@@ -48,6 +48,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5723503245582655115, guid: 687bceb0d8a354f7c82b1bb973ed3b1e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7783628239353291322, guid: 687bceb0d8a354f7c82b1bb973ed3b1e, type: 3}
       propertyPath: m_Name
       value: CurseFront

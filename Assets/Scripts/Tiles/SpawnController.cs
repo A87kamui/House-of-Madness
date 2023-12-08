@@ -75,7 +75,7 @@ public class SpawnController : MonoBehaviour
         spawnedGhost = true;
         isCursed = false;
         enemyCount++;
-        Debug.Log("SC SpawnGhost enemy count: " + enemyCount);
+        //Debug.Log("SC SpawnGhost enemy count: " + enemyCount);
     }
 
     IEnumerator SpawnCurseDelay()
@@ -94,7 +94,7 @@ public class SpawnController : MonoBehaviour
         pool[enemyCount].SetActive(true);
         isCursed = true;
         GameManager.instance.curseCount += 1;
-        Debug.Log("SC SpawnGhost enemy count: " + enemyCount);
+        //Debug.Log("SC SpawnGhost enemy count: " + enemyCount);
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ public class SpawnController : MonoBehaviour
 
         if (isCursed)
         {
-            Debug.Log("SC defeatcursedelay enemy count: " + enemyCount);
+            //Debug.Log("SC defeatcursedelay enemy count: " + enemyCount);
             curseExplosion.ExplosionPlay();
             pool[enemyCount].SetActive(false);
             enemyCount = 0;  // Reset count
@@ -167,7 +167,7 @@ public class SpawnController : MonoBehaviour
     /// <returns></returns>
     IEnumerator SwitchPlayerDelay()
     {
-        Debug.Log("SC SpawnGhost enemy count: " + enemyCount);
+        //Debug.Log("SC SpawnGhost enemy count: " + enemyCount);
         yield return new WaitForSeconds(2.0f);
         GameManager.instance.state = GameManager.States.SWITCH_PLAYER;
     }

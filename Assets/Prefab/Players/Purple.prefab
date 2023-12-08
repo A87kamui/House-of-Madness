@@ -96,6 +96,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SelectionRing
       objectReference: {fileID: 0}
+    - target: {fileID: 4490492875419043862, guid: 602e8d7c962b44624918fe1da4706cb0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8268090304983248971, guid: 602e8d7c962b44624918fe1da4706cb0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
