@@ -126,10 +126,13 @@ public class GridManager : MonoBehaviour
                 return;
             }
         }
-        HightLightTiles(dieNumber, hightlightNode.topNode, playerNode);
-        HightLightTiles(dieNumber, hightlightNode.bottomNode, playerNode);
-        HightLightTiles(dieNumber, hightlightNode.leftNode, playerNode);
-        HightLightTiles(dieNumber, hightlightNode.rightNode, playerNode);
+        else
+        {
+            HightLightTiles(dieNumber, hightlightNode.topNode, playerNode);
+            HightLightTiles(dieNumber, hightlightNode.bottomNode, playerNode);
+            HightLightTiles(dieNumber, hightlightNode.leftNode, playerNode);
+            HightLightTiles(dieNumber, hightlightNode.rightNode, playerNode);
+        }    
     }
 
     /// <summary>
