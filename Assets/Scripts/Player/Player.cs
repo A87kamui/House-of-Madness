@@ -150,7 +150,7 @@ public class Player : MonoBehaviour
         }
         else if (hasKey && currentNode.tag == "EntranceTile")
         {
-            Debug.Log("Dropped off key");
+            //Debug.Log("Dropped off key");
             hasKey = false;
             playerKey.SetActive(false);
             GameManager.instance.state = GameManager.States.WIN_CHECK;

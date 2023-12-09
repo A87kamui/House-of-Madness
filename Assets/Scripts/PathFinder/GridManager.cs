@@ -114,6 +114,18 @@ public class GridManager : MonoBehaviour
             tilesHighlighted.Add(hightlightNode);
         }
         dieNumber -= 1;
+        if (dieNumber <= 0 || hightlightNode == null)
+        {
+            if (tilesHighlighted.Count <= 0)
+            {
+                //Debug.Log("No place to move");
+                GameManager.instance.player.CheckGhostOrCurse();
+            }
+            else
+            {
+                return;
+            }
+        }
         HightLightTiles(dieNumber, hightlightNode.topNode, playerNode);
         HightLightTiles(dieNumber, hightlightNode.bottomNode, playerNode);
         HightLightTiles(dieNumber, hightlightNode.leftNode, playerNode);
